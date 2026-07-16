@@ -189,14 +189,22 @@
         .food-card .overlay p { font-size: 0.85rem; opacity: 0.9; color: #fff; }
         .food-card .badge-top { position: absolute; top: 15px; left: 15px; z-index: 5; }
 
-        .anime-section { padding: 100px 20px; text-align: center; position: relative; }
-        .anime-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; }
-        .anime-card { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; box-shadow: 0 8px 24px var(--shadow); transition: transform 0.3s; text-align: left; display: flex; flex-direction: column; }
-        .anime-card:hover { transform: translateY(-10px) scale(1.03); }
-        .anime-card img { width: 100%; height: 280px; object-fit: cover; }
-        .anime-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .anime-info h4 { font-size: 1.1rem; color: var(--text); margin: 8px 0 5px 0; }
-        .anime-info p { font-size: 0.8rem; color: var(--text); opacity: 0.7; line-height: 1.3; }
+        .anime-section { padding: 80px 20px; text-align: center; position: relative; }
+        .anime-grid { max-width: 1100px; margin: 0 auto; display: flex; gap: 22px; overflow-x: auto; padding: 18px 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; align-items: stretch; }
+        .anime-grid::-webkit-scrollbar{ height:10px; }
+        .anime-grid::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06)); border-radius: 10px; }
+        .anime-section { position: relative; }
+        .anime-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 28%), radial-gradient(circle at 80% 30%, rgba(255,181,197,0.18), transparent 22%), radial-gradient(circle at 50% 80%, rgba(166,211,255,0.18), transparent 24%); pointer-events: none; opacity: 0.8; }
+        .anime-particle { position: absolute; width: 10px; height: 10px; border-radius: 50%; opacity: 0; pointer-events: none; box-shadow: 0 0 20px rgba(255,255,255,0.7); filter: blur(0.5px); }
+        .anime-card { flex: 0 0 300px; scroll-snap-align: center; background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(240,245,255,0.72)); border-radius: 14px; overflow: hidden; position: relative; box-shadow: 0 14px 36px rgba(12,18,30,0.06); transition: transform 280ms cubic-bezier(.2,.9,.2,1), box-shadow 280ms; display:flex; flex-direction:column; z-index:1; }
+        .anime-card:hover{ transform: translateY(-8px) scale(1.03); z-index:10; box-shadow: 0 30px 60px rgba(12,18,30,0.12); }
+        .anime-card img{ width:100%; height:260px; object-fit:cover; display:block; }
+        .anime-info{ padding:14px 16px 18px; display:flex; flex-direction:column; gap:6px; }
+        .anime-info h4{ font-size:1.05rem; margin:0; }
+        .anime-info p{ font-size:0.86rem; margin:0; opacity:0.76; line-height:1.35; }
+
+        @media (max-width: 900px){ .anime-card{ flex:0 0 52%; } .anime-grid{ padding:14px; gap:14px; } }
+        @media (max-width: 480px){ .anime-card{ flex:0 0 88%; } .anime-grid{ gap:12px; padding:10px; } .anime-info{ padding:10px; } }
 
         .notes-section { padding: 100px 50px; text-align: center; position: relative; }
         .envelopes-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 50px; margin-top: 60px; }
@@ -293,7 +301,7 @@
     </section>
 
     <section class="scrapbook-section" id="gallery">
-        <h2 class="section-title">Kenangan Kita <span>tercinta</span></h2>
+        <h2 class="section-title">Gallery<span>tercinta</span></h2>
         <img src="https://i.pinimg.com/736x/a3/d3/1e/a3d31eadbbbfca7a0ccecc2568f0dc94.jpg" class="sticker mobile-hide" style="top: 10%; right: 5%; width: 100px; transform: rotate(10deg);" alt="Pikachu">
         <div class="scrapbook" id="scrapbook">
             <div class="polaroid" style="top: 5%; left: 10%;" data-rotation="-8"><img src="8.jpeg" alt="Momen 1"><div class="caption">Senyum pertamamu</div></div>
@@ -305,7 +313,7 @@
     </section>
 
     <section class="carousel-section">
-        <h2 class="section-title">Cerita Kita <span>Tetap Lembut</span></h2>
+        <h2 class="section-title">Cerita Kita <span>Tetap Bersama</span></h2>
         <p style="margin: -10px auto 20px; color: var(--text); opacity: 0.9; text-align:center; max-width:780px;">Di sini kami menyimpan potongan hari—tawa kecil, janji sederhana, dan momen biasa yang terasa luar biasa saat dilalui bersama. Sejak 17 Mei 2022, setiap hari menulis bab baru: ringan, jujur, dan penuh kasih. Lihat Cerita untuk merasakan kembali detik-detik paling lembut dari perjalanan kita.</p>
         <div class="carousel-container"><div class="carousel-track" id="carouselTrack"></div></div>
         <div class="carousel-controls">
@@ -618,6 +626,33 @@
         function initHearts() { hearts = []; for (let i = 0; i < 30; i++) hearts.push(new Heart()); }
         function animateHearts() { ctx.clearRect(0, 0, canvas.width, canvas.height); hearts.forEach(h => { h.update(); h.draw(); }); requestAnimationFrame(animateHearts); }
         initHearts(); animateHearts();
+
+        function spawnAnimeParticle() {
+            const section = document.querySelector('.anime-section');
+            if (!section) return;
+            const rect = section.getBoundingClientRect();
+            const particle = document.createElement('div');
+            particle.className = 'anime-particle';
+            const size = Math.random() * 8 + 6;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            const startX = rect.left + Math.random() * rect.width;
+            const startY = rect.top + Math.random() * rect.height;
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            particle.style.background = Math.random() > 0.5 ? 'rgba(255, 182, 193, 0.9)' : 'rgba(166, 211, 255, 0.9)';
+            document.body.appendChild(particle);
+            gsap.to(particle, {
+                x: (Math.random() - 0.5) * 60,
+                y: -(Math.random() * 100 + 40),
+                opacity: 0,
+                scale: 0.2,
+                duration: Math.random() * 1.2 + 1.2,
+                ease: 'power1.out',
+                onComplete: () => particle.remove()
+            });
+        }
+        setInterval(spawnAnimeParticle, 250);
 
         const cursor = document.getElementById('cursorHeart');
         window.addEventListener('mousemove', (e) => { gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.3, ease: "power2.out" }); });
